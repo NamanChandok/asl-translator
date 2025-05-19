@@ -139,7 +139,7 @@ def plot_confusion_matrix(y, y_pred):
     y = np.argmax(y, axis = 1)
     y_pred = np.argmax(y_pred, axis = 1)
     cm = confusion_matrix(y, y_pred)
-    plt.figure(figsize = (24, 20))
+    plt.figure(figsize = (12, 10))
     ax = plt.subplot()
     plt.imshow(cm, interpolation = 'nearest', cmap = plt.cm.Purples)
     plt.colorbar()

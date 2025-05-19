@@ -6,7 +6,6 @@ from keras.models import load_model
 model = load_model("asl_cnn_model.keras")
 
 mp_hands = mp.solutions.hands
-mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
     static_image_mode=False,
     max_num_hands=1,
@@ -29,8 +28,6 @@ def extract_hand(frame):
     if results.multi_hand_landmarks:
         hand_landmarks = results.multi_hand_landmarks[0]
 
-        mp_drawing.draw_landmarks(
-            frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
         landmarks = []
         for landmark in hand_landmarks.landmark:
