@@ -1,8 +1,6 @@
 # Python ASL Translator
 A real-time American Sign Language (ASL) translator leveraging Convolutional Neural Networks (CNNs) to interpret hand gestures captured via webcam and convert them into corresponding English text.​
 
-![Untitled](https://github.com/user-attachments/assets/a8928357-9c30-49f5-90cb-a54815291971)
-
 This project aims to bridge communication gaps for the deaf and hard-of-hearing community by translating ASL gestures into readable text. Utilizing computer vision and deep learning techniques, the system processes live video input to recognize ASL alphabets.​
 
 ## 📂 Project Structure
