@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 import mediapipe as mp
-from keras.models import load_model
+import tensorflow as tf
 
-model = load_model("asl_cnn_model.keras")
+model = tf.keras.models.load_model("asl_cnn_model.keras")
 
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(

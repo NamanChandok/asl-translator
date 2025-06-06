@@ -75,7 +75,7 @@ display_images(X_test, y_test)
 
 # ---
 
-import keras
+import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder
 
 label_encoder = LabelEncoder()
@@ -85,8 +85,8 @@ label_encoder.fit(all_labels)
 y_train = label_encoder.transform(y_train)
 y_test = label_encoder.transform(y_test)
 
-y_train = keras.utils.to_categorical(y_train)
-y_test = keras.utils.to_categorical(y_test)
+y_train = tf.keras.utils.to_categorical(y_train)
+y_test = tf.keras.utils.to_categorical(y_test)
 
 print(y_train[0])
 print(len(y_train[0]))
@@ -96,42 +96,36 @@ X_test = X_test.astype('float32')/255.0
 
 # ---
 
-import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 
-print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-
-model = Sequential()
-
-model.add(Conv2D(filters = 64, kernel_size = 7, padding = 'same', activation = 'relu',
-                 input_shape = (64, 64, 3)))
-model.add(Conv2D(filters = 64, kernel_size = 7, padding = 'same', activation = 'relu'))
-model.add(MaxPooling2D(pool_size = (4, 4)))
-model.add(Dropout(0.5))
-model.add(Conv2D(filters = 128 , kernel_size = 7, padding = 'same', activation = 'relu'))
-model.add(Conv2D(filters = 128 , kernel_size = 7, padding = 'same', activation = 'relu'))
-model.add(MaxPooling2D(pool_size = (4, 4)))
-model.add(Dropout(0.5))
-model.add(Conv2D(filters = 256 , kernel_size = 7, padding = 'same', activation = 'relu'))
-model.add(Dropout(0.5))
-model.add(Flatten())
-model.add(Dense(36, activation='softmax'))
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(64, 64, 3)),
+    tf.keras.layers.Conv2D(filters = 64, kernel_size = 7, padding = 'same', activation = 'relu'),
+    tf.keras.layers.Conv2D(filters = 64, kernel_size = 7, padding = 'same', activation = 'relu'),
+    tf.keras.layers.MaxPooling2D(pool_size = (4, 4)),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Conv2D(filters = 128 , kernel_size = 7, padding = 'same', activation = 'relu'),
+    tf.keras.layers.Conv2D(filters = 128 , kernel_size = 7, padding = 'same', activation = 'relu'),
+    tf.keras.layers.MaxPooling2D(pool_size = (4, 4)),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Conv2D(filters = 256 , kernel_size = 7, padding = 'same', activation = 'relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(36, activation='softmax')
+])
 
 model.summary()
 
 # ---
 
 model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
-hist = model.fit(X_train, y_train, epochs = 10, batch_size = 64)
+hist = model.fit(X_train, y_train, epochs = 5, batch_size = 64)
 
 score = model.evaluate(x = X_test, y = y_test, verbose = 0)
 print('Accuracy for test images:', round(score[1]*100, 3), '%')
 
 # ---
 
-from keras.models import load_model
-model = load_model("asl_cnn_model.keras")
+model.save("asl_cnn_model.keras")
 
 # ---
 
@@ -164,7 +158,3 @@ y_test_pred = model.predict(X_test, batch_size = 64, verbose = 0)
 plot_confusion_matrix(y_test, y_test_pred)
 
 # ---
-
-from keras.models import save_model
-
-model.save_model("asl_cnn_model.keras")
