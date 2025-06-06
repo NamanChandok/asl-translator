@@ -13,7 +13,7 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5
 )
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 labels = list("0123456789abcdefghijklmnopqrstuvxyz")
 
 if not cap.isOpened():
@@ -27,7 +27,6 @@ def extract_hand(frame):
 
     if results.multi_hand_landmarks:
         hand_landmarks = results.multi_hand_landmarks[0]
-
 
         landmarks = []
         for landmark in hand_landmarks.landmark:
@@ -45,22 +44,38 @@ def extract_hand(frame):
         x_max = min(frame.shape[1], x_max + padding)
         y_max = min(frame.shape[0], y_max + padding)
 
+        # Create base mask from landmarks
         hand_mask = np.zeros(frame.shape[:2], dtype=np.uint8)
-
         hull = cv2.convexHull(landmarks)
         cv2.fillConvexPoly(hand_mask, hull, 255)
 
-        kernel = np.ones((7, 7), np.uint8)
-        hand_mask = cv2.dilate(hand_mask, kernel, iterations=2)
+        # Apply skin color segmentation to refine the mask
+        frame_ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
 
-        hand_on_black = np.zeros_like(frame)
-        hand_on_black[hand_mask > 0] = frame[hand_mask > 0]
+        # Skin color range in YCrCb
+        lower_skin = np.array([0, 135, 85], dtype=np.uint8)
+        upper_skin = np.array([255, 180, 135], dtype=np.uint8)
 
+        skin_mask = cv2.inRange(frame_ycrcb, lower_skin, upper_skin)
+
+        # Combine landmark-based mask with skin color mask
+        final_mask = cv2.bitwise_and(hand_mask, skin_mask)
+
+        # Clean up the mask
+        kernel = np.ones((5, 5), np.uint8)
+        final_mask = cv2.morphologyEx(final_mask, cv2.MORPH_CLOSE, kernel)
+        final_mask = cv2.dilate(final_mask, kernel, iterations=1)
+
+        # Extract hand with clean background (black)
+        hand_on_black = np.zeros_like(frame)  # Black background
+        hand_on_black[final_mask > 0] = frame[final_mask > 0]
+        
         hand_roi = hand_on_black[y_min:y_max, x_min:x_max]
 
         if hand_roi.size == 0:
             return None, frame, None, None
 
+        # Enhance contrast
         lab = cv2.cvtColor(hand_roi, cv2.COLOR_BGR2LAB)
         l, a, b = cv2.split(lab)
         clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
@@ -68,7 +83,7 @@ def extract_hand(frame):
         enhanced_lab = cv2.merge((cl, a, b))
         enhanced_hand_roi = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
 
-        return enhanced_hand_roi, frame, (x_min, y_min, x_max, y_max), hand_mask
+        return enhanced_hand_roi, frame, (x_min, y_min, x_max, y_max), final_mask
 
     return None, frame, None, None
 
