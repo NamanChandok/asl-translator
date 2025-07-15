@@ -1,16 +1,18 @@
-# Python ASL Translator
+<img alt="ASL Translator" style="width:100%" src="https://github.com/user-attachments/assets/434012f5-8a26-4bc9-b8d6-37bdf70074f0" />
+
+## Introduction
 A real-time American Sign Language (ASL) translator leveraging Convolutional Neural Networks (CNNs) to interpret hand gestures captured via webcam and convert them into corresponding English text.​
 
 This project aims to bridge communication gaps for the deaf and hard-of-hearing community by translating ASL gestures into readable text. Utilizing computer vision and deep learning techniques, the system processes live video input to recognize ASL alphabets.​
 
-## 📂 Project Structure
+## Project Structure
 - `asl_dataset/`: Directory containing ASL images used for training and validation.
 - `asl_cnn_model.keras`: Pre-trained Keras model for ASL alphabet recognition.
 - `cam.py`: Script to capture real-time video input from the webcam.
 - `main.py`: Main application script that integrates video capture and model prediction.
 - `requirements.txt`: List of Python dependencies required to run the project
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.7 or higher
@@ -31,7 +33,7 @@ Run the Python File
 python3 Cam.py
 ```
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
